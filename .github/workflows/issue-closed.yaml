@@ -6,9 +6,10 @@ jobs:
   my-action:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Run my-action
+    - uses: actions/checkout@v3
+    - name: Setup go
+      uses: actions/setup-go@v3
+    - name: :arrow_right: Run action
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}

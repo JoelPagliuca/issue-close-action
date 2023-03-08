@@ -40,7 +40,7 @@ func main() {
 	}
 
 	// Print the issue title
-	fmt.Printf("Issue %d (%s) closed: %s\n", payload.Issue.Number, payload.Issue.State, payload.Issue.Title)
+	fmt.Printf("Issue #%d closed: %s\n", payload.Issue.Number, payload.Issue.Title)
 
 	// Perform your action here...
 	fmt.Println("Do something with the closed issue...")
