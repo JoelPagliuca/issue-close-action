@@ -9,7 +9,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Setup go
       uses: actions/setup-go@v3
-    - name: :arrow_right: Run action
+    - name: ➡️ Run action
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}
