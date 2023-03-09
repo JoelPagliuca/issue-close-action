@@ -39,11 +39,11 @@ func main() {
 			fmt.Printf("Error sending Discord webhook: %v", err)
 			return
 		}
+		fmt.Println("Sent issue title to Discord!")
 	}
 
 	// Print a message to the console
 	fmt.Printf("Issue #%d closed: %s\n", payload.Issue.Number, payload.Issue.Title)
-	fmt.Println("Sent issue title to Discord!")
 }
 
 // Helper function to parse the Github event payload
