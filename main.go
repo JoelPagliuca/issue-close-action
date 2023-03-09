@@ -3,25 +3,17 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
+	"strings"
 )
 
 type IssueEvent struct {
 	Action string `json:"action"`
 	Issue  struct {
 		Number int    `json:"number"`
-		State  string `json:"state"`
 		Title  string `json:"title"`
 	} `json:"issue"`
-	Repository struct {
-		Name  string `json:"name"`
-		Owner struct {
-			Login string `json:"login"`
-		} `json:"owner"`
-	} `json:"repository"`
-	Sender struct {
-		Login string `json:"login"`
-	} `json:"sender"`
 }
 
 func main() {
@@ -39,11 +31,19 @@ func main() {
 		return
 	}
 
-	// Print the issue title
-	fmt.Printf("Issue #%d closed: %s\n", payload.Issue.Number, payload.Issue.Title)
+	// Send the issue title to a Discord webhook
+	webhookURL := os.Getenv("DISCORD_WEBHOOK_URL")
+	if webhookURL != "" {
+		err = sendDiscordWebhook(webhookURL, payload.Issue.Title)
+		if err != nil {
+			fmt.Printf("Error sending Discord webhook: %v", err)
+			return
+		}
+	}
 
-	// Perform your action here...
-	fmt.Println("Do something with the closed issue...")
+	// Print a message to the console
+	fmt.Printf("Issue #%d closed: %s\n", payload.Issue.Number, payload.Issue.Title)
+	fmt.Println("Sent issue title to Discord!")
 }
 
 // Helper function to parse the Github event payload
@@ -61,4 +61,42 @@ func parsePayload(path string) (*IssueEvent, error) {
 	}
 
 	return &payload, nil
+}
+
+// Helper function to send a message to a Discord webhook
+func sendDiscordWebhook(webhookURL string, message string) error {
+	// Create the payload data
+	payload := map[string]string{
+		"content": message,
+	}
+
+	// Convert the payload to JSON
+	payloadJSON, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("failed to encode payload: %v", err)
+	}
+
+	// Create a new POST request
+	req, err := http.NewRequest("POST", webhookURL, strings.NewReader(string(payloadJSON)))
+	if err != nil {
+		return fmt.Errorf("failed to create POST request: %v", err)
+	}
+
+	// Set the content type to application/json
+	req.Header.Set("Content-Type", "application/json")
+
+	// Send the request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send POST request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Check the response status code
+	if resp.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("unexpected response status code: %d", resp.StatusCode)
+	}
+
+	return nil
 }

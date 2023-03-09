@@ -3,7 +3,7 @@ on:
   issues:
     types: [closed]
 jobs:
-  my-action:
+  issue-closed:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -11,8 +11,7 @@ jobs:
       uses: actions/setup-go@v3
     - name: ➡️ Run action
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_REPOSITORY: ${{ github.repository }}
         GITHUB_EVENT_PATH: ${{ github.event_path }}
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       run: |
         go run main.go
